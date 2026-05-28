@@ -257,11 +257,11 @@
 
     function render(index) {
       const q = quotes[index];
-      document.getElementById("quoteText").textContent = "„" + q.quote + "“";
-      document.getElementById("quoteContext").textContent = q.context;
-      document.getElementById("quoteSourceText").textContent = "Šaltinis: " + q.source;
-      document.getElementById("quoteSource").href = q.url;
-      counterEl.textContent = (index + 1) + " / " + quotes.length;
+      document.getElementById(“quoteText”).textContent = '„' + q.quote + '“';
+      document.getElementById(“quoteContext”).textContent = q.context;
+      document.getElementById(“quoteSourceText”).textContent = 'Saltinis: ' + q.source;
+      document.getElementById(“quoteSource”).href = q.url;
+      counterEl.textContent = (index + 1) + ' / ' + quotes.length;
     }
 
     function transition(newIndex) {
