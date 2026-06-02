@@ -58,7 +58,9 @@
       padding: 0.55rem 1rem;
       font-size: 0.9rem;
       font-variant-numeric: tabular-nums;
+      transition: opacity 0.22s ease;
     }
+    .counter.fade { opacity: 0; }
 
     .quote-card {
       overflow: hidden;
@@ -96,9 +98,9 @@
     blockquote p {
       margin: 0;
       color: #ffffff;
-      font-size: clamp(1.6rem, 6.5vw, 5.5rem);
-      line-height: 1.04;
-      letter-spacing: -0.04em;
+      font-size: clamp(1.3rem, 4.5vw, 3.8rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
       font-weight: 900;
       text-wrap: balance;
     }
@@ -222,16 +224,25 @@
     const quotes = JSON.parse(document.getElementById('quotes-data').textContent);
 
     let current = 0;
+    let autoTimer = null;
+    let paused = false;
+
     const content = document.getElementById('quoteContent');
     const counterEl = document.getElementById('counter');
+    const card = document.getElementById('quoteContent').closest('.quote-card');
 
     function render(index) {
       const q = quotes[index];
-      document.getElementById('quoteText').textContent = q.quote;
+      document.getElementById('quoteText').textContent = '„' + q.quote + '“';
       document.getElementById('quoteContext').textContent = q.context;
-      document.getElementById('quoteSourceText').textContent = 'Saltinis: ' + q.source;
+      document.getElementById('quoteSourceText').textContent = 'ŠALTINIS: ' + q.source;
       document.getElementById('quoteSource').href = q.url;
-      counterEl.textContent = (index + 1) + ' / ' + quotes.length;
+      // animate counter
+      counterEl.classList.add('fade');
+      setTimeout(() => {
+        counterEl.textContent = (index + 1) + ' / ' + quotes.length;
+        counterEl.classList.remove('fade');
+      }, 120);
     }
 
     function transition(newIndex) {
@@ -247,17 +258,32 @@
       }, 220);
     }
 
-    document.getElementById('btnNext').onclick = () =>
-      transition((current + 1) % quotes.length);
-    document.getElementById('btnPrev').onclick = () =>
-      transition((current - 1 + quotes.length) % quotes.length);
+    function next() { transition((current + 1) % quotes.length); }
+    function prev() { transition((current - 1 + quotes.length) % quotes.length); }
+
+    // Auto-play
+    function startAuto() {
+      autoTimer = setInterval(() => { if (!paused) next(); }, 12000);
+    }
+    card.addEventListener('mouseenter', () => { paused = true; });
+    card.addEventListener('mouseleave', () => { paused = false; });
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    });
+
+    document.getElementById('btnNext').onclick = next;
+    document.getElementById('btnPrev').onclick = prev;
     document.getElementById('btnRandom').onclick = () => {
-      let next = current;
-      while (next === current) next = Math.floor(Math.random() * quotes.length);
-      transition(next);
+      let r = current;
+      while (r === current) r = Math.floor(Math.random() * quotes.length);
+      transition(r);
     };
 
     render(0);
+    startAuto();
   </script>
 </body>
 </html>
