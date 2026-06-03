@@ -306,6 +306,10 @@
     function prev() { transition((current - 1 + quotes.length) % quotes.length); }
 
     // Auto-play
+    function resetAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => { if (!paused) next(); }, 12000);
+    }
     function startAuto() {
       autoTimer = setInterval(() => { if (!paused) next(); }, 12000);
     }
@@ -314,16 +318,17 @@
 
     // Keyboard
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') { next(); resetAuto(); }
+      if (e.key === 'ArrowLeft')  { prev(); resetAuto(); }
     });
 
-    document.getElementById('btnNext').onclick = next;
-    document.getElementById('btnPrev').onclick = prev;
+    document.getElementById('btnNext').onclick = () => { next(); resetAuto(); };
+    document.getElementById('btnPrev').onclick = () => { prev(); resetAuto(); };
     document.getElementById('btnRandom').onclick = () => {
       let r = current;
       while (r === current) r = Math.floor(Math.random() * quotes.length);
       transition(r);
+      resetAuto();
     };
 
     render(0);
